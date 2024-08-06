@@ -698,6 +698,7 @@ namespace PluginCCS {
             OnPlayerFinishConnectingEvent.Register(OnPlayerFinishConnecting, Priority.High);
             OnInfoSwapEvent.Register(OnInfoSwap, Priority.Low);
             OnJoiningLevelEvent.Register(OnJoiningLevel, Priority.High);
+            OnJoinedLevelEvent.Register(OnJoinedLevel, Priority.High);
             OnPlayerSpawningEvent.Register(OnPlayerSpawning, Priority.High);
             OnLevelRenamedEvent.Register(OnLevelRenamed, Priority.Low);
             OnLevelUnloadEvent.Register(OnLevelUnload, Priority.Low);
@@ -736,6 +737,7 @@ namespace PluginCCS {
             OnPlayerFinishConnectingEvent.Unregister(OnPlayerFinishConnecting);
             OnInfoSwapEvent.Unregister(OnInfoSwap);
             OnJoiningLevelEvent.Unregister(OnJoiningLevel);
+            OnJoinedLevelEvent.Unregister(OnJoinedLevel);
             OnPlayerSpawningEvent.Unregister(OnPlayerSpawning);
             OnLevelRenamedEvent.Unregister(OnLevelRenamed);
             OnPlayerChatEvent.Unregister(OnPlayerChat);
@@ -784,6 +786,10 @@ namespace PluginCCS {
         }
         static void OnJoiningLevel(Player p, Level lvl, ref bool canJoin) {
             Script.OnJoiningLevel(p, lvl, ref canJoin);
+        }
+
+        static void OnJoinedLevel(Player p, Level prevLevel, Level lvl, ref bool announce) {
+            Script.OnJoinedLevel(p, prevLevel, lvl, ref announce);
         }
         static void OnPlayerSpawning(Player p, ref Position pos, ref byte yaw, ref byte pitch, bool respawning) {
             if (respawning) { return; } //Only call when spawning in a new level
@@ -1373,6 +1379,21 @@ namespace PluginCCS {
                 lvl.AutoUnload();
             }
         }
+
+        public static void OnJoinedLevel(Player p, Level prevLevel, Level lvl, ref bool announce){
+            string filePath = PATH + lvl.name + EXT;
+            string startLabel = "#onJoin";
+            if (!File.Exists(filePath)) { return; };
+            
+        //am tired
+        //check if label "#onJoin" exists
+        //if not return
+
+            CommandData data2 = default(CommandData); data2.Context = CommandContext.MessageBlock;
+
+            ScriptRunner.PerformScript(p, lvl.name, "#onJoin", RunnerPerms.Staff, false, data2);
+        }
+
         public static void OnLevelRenamed(string srcMap, string dstMap) {
             string srcPath = PATH_OS + srcMap + EXT;
             string dstPath = PATH_OS + dstMap + EXT;
