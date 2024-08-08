@@ -1367,7 +1367,6 @@ namespace PluginCCS {
             string filePath = PATH + lvl.name + EXT;
             if (!File.Exists(filePath)) { return; }
 
-
             CommandData data2 = default(CommandData); data2.Context = CommandContext.MessageBlock;
             ScriptData scriptData = Core.GetScriptData(p);
             scriptData.SetString("denyAccess", "", RunnerPerms.Staff, lvl.name);
@@ -1380,15 +1379,15 @@ namespace PluginCCS {
             }
         }
 
+        //#onJoin
+        //
         public static void OnJoinedLevel(Player p, Level prevLevel, Level lvl, ref bool announce){
             string filePath = PATH + lvl.name + EXT;
+            string filePathOS = PATH_OS + lvl.name + EXT;
             string startLabel = "#onJoin";
             if (!File.Exists(filePath)) { return; };
+            if (!File.Exists(filePathOS)) { return; };
             
-        //am tired
-        //check if label "#onJoin" exists
-        //if not return
-
             CommandData data2 = default(CommandData); data2.Context = CommandContext.MessageBlock;
 
             ScriptRunner.PerformScript(p, lvl.name, "#onJoin", RunnerPerms.Staff, false, data2);
@@ -1958,6 +1957,11 @@ namespace PluginCCS {
                 if (startLabel == "#accessControl") {
                     return;
                 }
+
+                if (startLabel == "#onJoin") {
+                    return;
+                }
+
                 p.Message("&cScript error: unknown starting label \"" + startLabel + "\".");
                 p.Message(CmdScript.labelHelp);
                 return;
