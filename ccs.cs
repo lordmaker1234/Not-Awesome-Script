@@ -713,6 +713,7 @@ namespace PluginCCS {
             OnPlayerDisconnectEvent.Register(OnPlayerDisconnect, Priority.Low);
             OnPlayerMoveEvent.Register(OnPlayerMove, Priority.Low);
             OnPlayerClickEvent.Register(OnPlayerClick, Priority.Low);
+            OnChangedZoneEvent.Register(OnChangedZone, Priority.High);
 
             foreach (Player pl in PlayerInfo.Online.Items) {
                 OnPlayerFinishConnecting(pl);
@@ -751,6 +752,7 @@ namespace PluginCCS {
             OnPlayerDisconnectEvent.Unregister(OnPlayerDisconnect);
             OnPlayerMoveEvent.Unregister(OnPlayerMove);
             OnPlayerClickEvent.Unregister(OnPlayerClick);
+            OnChangedZoneEvent.Unregister(OnChangedZone);
 
             SaveAllPlayerData();
             scriptDataAtPlayer.Clear();
@@ -922,6 +924,35 @@ namespace PluginCCS {
             DoClick(p, data.clickEvents.sync, coords, clickInfo);
             DoClick(p, data.clickEvents.async, coords, clickInfo);
         }
+
+         static void OnChangedZone(Player p) {
+            Zone enteredZone = p.ZoneIn;
+            if (p.ZoneIn == null) { return; }
+
+            string zoneName = enteredZone.Config.Name;
+            string zoneLabel = zoneName.Contains('#') ? zoneName.Substring(zoneName.IndexOf('#')) : null;
+            if (zoneLabel == null) { return; }
+            string zoneLabelTrimmed = zoneLabel.Contains('|') ? zoneLabel.Remove(zoneLabel.IndexOf('|')) : zoneLabel;
+
+            string scriptName;
+            RunnerPerms perms;
+            if (Script.IsOs(p.level)) {
+                scriptName = Script.OS_PREFIX + p.level.name;
+                perms = new RunnerPerms(p.level);
+            } else {
+                scriptName = p.level.name;
+                perms = RunnerPerms.Staff;
+            }
+
+            string fullPath = Script.FullPath(scriptName);
+            if (!File.Exists(fullPath)) { return; }
+            Script script = Script.Get(p, scriptName);
+            if  (!script.HasLabel(zoneLabelTrimmed)) { return; }
+
+            CommandData data = new CommandData();
+            ScriptRunner.PerformScript(p, p.level, scriptName, zoneLabel, perms, false, data);
+        }
+
         static void DoClick(Player p, Sevent sevent, Vec3S32 coords, ClickInfo clickInfo) {
             if (sevent == null) { return; }
             ScriptRunner.PerformScriptOnNewThread(p, p.level, sevent.scriptName, sevent.scriptLabel, sevent.perms, sevent.async,
