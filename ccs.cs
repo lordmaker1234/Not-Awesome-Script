@@ -947,7 +947,7 @@ namespace PluginCCS {
             string fullPath = Script.FullPath(scriptName);
             if (!File.Exists(fullPath)) { return; }
             Script script = Script.Get(p, scriptName);
-            if  (!script.HasLabel(zoneLabelTrimmed)) { return; }
+            if  (!script.HasLabel(zoneLabelTrimmed) || !script.actions.Any(action => action.uses.zone_labels)) { return; }
 
             CommandData data = new CommandData();
             ScriptRunner.PerformScript(p, p.level, scriptName, zoneLabel, perms, false, data);
@@ -1631,10 +1631,12 @@ namespace PluginCCS {
             const string CEF = "cef";
             const string QUIT_RESETS_RUNARGS = "quit_resets_runargs";
             public const string LOCAL_PACKAGES = "local_packages";
+            public const string ZONE_LABELS = "zone_labels";
 
             public bool cef;
             public bool quitResetsRunArgs;
             public bool local_packages;
+            public bool zone_labels;
 
             public const string ALLOW_INCLUDE = "allow_include";
             public const string LOCAL_PACKAGES_PREFIX = "l_";
@@ -1646,6 +1648,7 @@ namespace PluginCCS {
                 if (line == CEF) { cef = true; }
                 else if (line == QUIT_RESETS_RUNARGS) { quitResetsRunArgs = true; }
                 else if (line == LOCAL_PACKAGES) { local_packages = true; }
+                else if (line == ZONE_LABELS) { zone_labels = true; }
 
                 return true;
             }
