@@ -4699,6 +4699,14 @@ namespace PluginCCS {
                 return run.perms.actionLimit.ToString();
             }
         }
+        public class mapName : ReadOnlyPackage
+        {
+            public override string desc { get { return "The name of the map the player is currently in."; } }
+            public override string Getter(ScriptRunner run)
+            {
+                return run.p.level.name;
+            }
+        }
 
     }
 
